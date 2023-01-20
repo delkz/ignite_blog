@@ -1,6 +1,6 @@
-﻿import { format } from "date-fns";
+﻿import { Flex, Stack, Text, Icon } from "@chakra-ui/react";
+import { format } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
-import Link from "next/link";
 import { FiCalendar, FiUser } from "react-icons/fi";
 
 interface Post {
@@ -18,28 +18,26 @@ interface PostProps {
 const Post = ({ data }: PostProps): JSX.Element => {
   const content = data.data;
   return (
-    <div gap={0} flexDirection="column">
-      <Link href={`/post/${data.uid}`}>
-        <div color="brand.heading" fontWeight="bold" fontSize="28px">
-          {content.title}
-        </div>
-      </Link>
-      <div color="brand.body" gap={3}>
-        <div fontSize="18px">{content.subtitle}</div>
-        <div color="brand.body" fontSize="14px" gap={3}>
-          <div align="center" gap={1}>
-            <div as={FiCalendar} boxSize={4} />
+    <Flex gap={0} flexDirection="column">
+      <Text color="brand.heading" fontWeight="bold" fontSize="28px">
+        {content.title}
+      </Text>
+      <Stack color="brand.body" gap={3}>
+        <Text fontSize="18px">{content.subtitle}</Text>
+        <Flex color="brand.body" fontSize="14px" gap={3}>
+          <Flex align="center" gap={1}>
+            <Icon as={FiCalendar} boxSize={4} />
             {format(new Date(data.first_publication_date), "d LLL y", {
               locale: ptBR,
             })}
-          </div>
-          <div align="center" gap={1}>
-            <div as={FiUser} boxSize={4} />
+          </Flex>
+          <Flex align="center" gap={1}>
+            <Icon as={FiUser} boxSize={4} />
             {content.author}
-          </div>
-        </div>
-      </div>
-    </div>
+          </Flex>
+        </Flex>
+      </Stack>
+    </Flex>
   );
 };
 
