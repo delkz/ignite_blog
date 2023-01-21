@@ -1,12 +1,13 @@
-import { GetStaticProps } from "next";
-import { Box, Button, Stack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import te from "date-fns/esm/locale/te/index.js";
-import PostElement from "../components/Post";
-import { getPrismicClient } from "../services/prismic";
+import { GetStaticProps } from 'next';
+import { Box, Button, Stack } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import te from 'date-fns/esm/locale/te/index.js';
+import PostElement from '../components/Post';
+import { getPrismicClient } from '../services/prismic';
 
-import commonStyles from "../styles/common.module.scss";
-import styles from "./home.module.scss";
+import commonStyles from '../styles/common.module.scss';
+import styles from './home.module.scss';
+import { PrismicDocument } from '@prismicio/types';
 
 interface Post {
   uid?: string;
@@ -28,38 +29,44 @@ interface PostPagination {
 interface HomeProps {
   postsPagination: PostPagination;
 }
+function parseResult(
+  result: PrismicDocument<Record<string, any>, string, string>[]
+): Post[] {
+  const posts: Post[] = result.map(({ data, uid, first_publication_date }) => ({
+    data: {
+      author: data.author,
+      subtitle: data.subtitle,
+      title: data.title,
+    },
+    first_publication_date,
+    uid,
+  }));
 
+  return posts;
+}
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
-  const [posts, setPosts] = useState(postsPagination);
+  const [posts, setPosts] = useState(postsPagination?.results ?? []);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [nextPage, setNextPage] = useState(postsPagination.next_page);
 
   const handleLoadMorePosts = (): void => {
     if (postsPagination.next_page != null) {
       fetch(postsPagination.next_page)
-        .then((response) => {
-          return response.text();
-        })
-        .then((data) => {
-          const newData: PostPagination = JSON.parse(data);
-
-          const tempPostsPagination = {
-            ...postsPagination,
-            next_page: newData.next_page,
-            prev_page: newData.prev_page,
-            page: newData.page,
-            results: [...postsPagination.results, ...newData.results],
-          };
-
-          setPosts(tempPostsPagination);
+        .then(result => result.json())
+        .then(data => {
+          setPosts([...posts, ...parseResult(data.results)]);
+          setNextPage(data.next_page);
+          setLoadingMore(false);
         });
     }
   };
 
   return (
     <Stack gap="48px" alignItems="baseline">
-      {posts.results.map((post) => {
+      {posts.map(post => {
         return <PostElement key={post.uid} data={post} />;
       })}
-      {posts.next_page && (
+      {nextPage && (
         <Button
           onClick={() => {
             handleLoadMorePosts();
@@ -68,6 +75,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
           fontWeight="bold"
           marginRight="auto"
           marginLeft="0"
+          variant="link"
         >
           Carregar mais posts
         </Button>
@@ -78,7 +86,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
 
 export const getStaticProps: GetStaticProps = async () => {
   const prismic = getPrismicClient({});
-  const postsResponse = await prismic.getByType("posts", {
+  const postsResponse = await prismic.getByType(`posts`, {
     pageSize: 5,
   });
 

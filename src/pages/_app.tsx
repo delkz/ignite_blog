@@ -7,7 +7,7 @@ import Header from "../components/Header";
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <ChakraProvider theme={theme}>
-      <Box bg="brand.background" height="100%">
+      <Box bg="brand.background" height="100%" minH="100vh">
         <Header />
         <Box maxWidth={1280} p={5} margin="auto">
           <Component {...pageProps} />
