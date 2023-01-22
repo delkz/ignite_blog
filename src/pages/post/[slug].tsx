@@ -1,5 +1,5 @@
 import { Box, Flex, Icon, Text } from '@chakra-ui/react';
-import { format } from 'date-fns';
+import { format, minutesToHours } from 'date-fns';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { RichText } from 'prismic-dom';
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
@@ -9,6 +9,7 @@ import { getPrismicClient } from '../../services/prismic';
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 interface Post {
   first_publication_date: string | null;
@@ -31,12 +32,44 @@ interface PostProps {
   post: Post;
 }
 
+interface Content {
+  heading: string;
+  body: {
+    text: string;
+  }[];
+}
+
 export default function Post({ post }: PostProps): JSX.Element {
   const router = useRouter();
+
+  function calculateReadingTime(content: Content[]): string {
+    const getHeadingWordsPerMinutes = content.reduce((acc, currentValue) => {
+      return currentValue.heading.split(/\s+/).length + acc;
+    }, 0);
+
+    const getBodyWordsPerMinutes = content.reduce((acc, currentValue) => {
+      return RichText.asText(currentValue.body).split(/\s+/).length + acc;
+    }, 0);
+
+    const getWordsPerMinutes = Math.ceil(
+      (getHeadingWordsPerMinutes + getBodyWordsPerMinutes) / 200
+    );
+
+    if (getWordsPerMinutes < 1) {
+      return 'Rápida leitura';
+    }
+
+    if (getWordsPerMinutes < 60) {
+      return `${getWordsPerMinutes} min`;
+    }
+
+    return `${minutesToHours(getWordsPerMinutes)} horas`;
+  }
+
   if (router.isFallback) {
     return (
       <>
-        <Box>
+        <Box color="brand.body">
           <Box as="span">Carregando...</Box>
         </Box>
       </>
@@ -45,6 +78,9 @@ export default function Post({ post }: PostProps): JSX.Element {
 
   return (
     <Box color="brand.body">
+      <Head>
+        <title>{post.data.title} | Spacetraveling</title>
+      </Head>
       <Text fontSize="48px" fontWeight="bold" color="brand.heading">
         {post.data.title}
       </Text>
@@ -61,7 +97,7 @@ export default function Post({ post }: PostProps): JSX.Element {
         </Flex>
         <Flex gap={1} alignItems="center">
           <Icon as={FiClock} boxSize={4} />
-          {/* {calculateReadingTime(post.data.content)} */}
+          {calculateReadingTime(post.data.content)}
         </Flex>
       </Flex>
       <Box>

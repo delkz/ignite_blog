@@ -1,13 +1,12 @@
 import { GetStaticProps } from 'next';
-import { Box, Button, Stack } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
-import te from 'date-fns/esm/locale/te/index.js';
-import PostElement from '../components/Post';
-import { getPrismicClient } from '../services/prismic';
-
-import commonStyles from '../styles/common.module.scss';
-import styles from './home.module.scss';
+import { Button, Flex, Icon, Link, Stack, Text } from '@chakra-ui/react';
+import { useState } from 'react';
 import { PrismicDocument } from '@prismicio/types';
+import { FiCalendar, FiUser } from 'react-icons/fi';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import Head from 'next/head';
+import { getPrismicClient } from '../services/prismic';
 
 interface Post {
   uid?: string;
@@ -63,8 +62,33 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
 
   return (
     <Stack gap="48px" alignItems="baseline">
+      <Head>
+        <title>Posts | Spacetraveling</title>
+      </Head>
       {posts.map(post => {
-        return <PostElement key={post.uid} data={post} />;
+        return (
+          <Flex key={post.uid} gap={0} flexDirection="column">
+            <Text color="brand.heading" fontWeight="bold" fontSize="28px">
+              <Link href={`/post/${post.uid}`}>{post.data.title}</Link>
+            </Text>
+
+            <Stack color="brand.body" gap={3}>
+              <Text fontSize="18px">{post.data.subtitle}</Text>
+              <Flex color="brand.body" fontSize="14px" gap={3}>
+                <Flex align="center" gap={1}>
+                  <Icon as={FiCalendar} boxSize={4} />
+                  {format(new Date(post.first_publication_date), 'd LLL y', {
+                    locale: ptBR,
+                  })}
+                </Flex>
+                <Flex align="center" gap={1}>
+                  <Icon as={FiUser} boxSize={4} />
+                  {post.data.author}
+                </Flex>
+              </Flex>
+            </Stack>
+          </Flex>
+        );
       })}
       {nextPage && (
         <Button
@@ -87,7 +111,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
 export const getStaticProps: GetStaticProps = async () => {
   const prismic = getPrismicClient({});
   const postsResponse = await prismic.getByType(`posts`, {
-    pageSize: 5,
+    pageSize: 3,
   });
 
   return {
