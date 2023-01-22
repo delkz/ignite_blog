@@ -47,8 +47,8 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
   const [nextPage, setNextPage] = useState(postsPagination.next_page);
 
   const handleLoadMorePosts = (): void => {
-    if (postsPagination.next_page != null) {
-      fetch(postsPagination.next_page)
+    if (nextPage != null) {
+      fetch(nextPage)
         .then(result => result.json())
         .then(data => {
           setPosts([...posts, ...parseResult(data.results)]);
@@ -59,7 +59,14 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
   };
 
   return (
-    <Stack gap="48px" alignItems="baseline">
+    <Stack
+      maxWidth={1280}
+      p={5}
+      margin="auto"
+      gap="48px"
+      alignItems="baseline"
+      pb="5em"
+    >
       <Head>
         <title>Posts | Spacetraveling</title>
       </Head>

@@ -9,7 +9,7 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
     <ChakraProvider theme={theme}>
       <Box bg="brand.background" height="100%" minH="100vh">
         <Header />
-        <Box maxWidth={1280} p={5} margin="auto">
+        <Box>
           <Component {...pageProps} />
         </Box>
       </Box>

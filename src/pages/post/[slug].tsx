@@ -1,4 +1,4 @@
-import { Box, Flex, Icon, Text } from '@chakra-ui/react';
+import { Box, Flex, Icon, Image, Text } from '@chakra-ui/react';
 import { format, minutesToHours } from 'date-fns';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { RichText } from 'prismic-dom';
@@ -77,49 +77,63 @@ export default function Post({ post }: PostProps): JSX.Element {
   }
 
   return (
-    <Box color="brand.body">
+    <Box color="brand.body" pb="5em">
       <Head>
         <title>{post.data.title} | Spacetraveling</title>
       </Head>
-      <Text fontSize="48px" fontWeight="bold" color="brand.heading">
-        {post.data.title}
-      </Text>
-      <Flex gap={2} className={styles.postInfo} mb={8}>
-        <Flex gap={1} alignItems="center">
-          <Icon as={FiCalendar} boxSize={4} />
-          {format(new Date(post.first_publication_date), 'd LLL y', {
-            locale: ptBR,
-          })}
-        </Flex>
-        <Flex gap={1} alignItems="center">
-          <Icon as={FiUser} boxSize={4} />
-          {post.data.author}
-        </Flex>
-        <Flex gap={1} alignItems="center">
-          <Icon as={FiClock} boxSize={4} />
-          {calculateReadingTime(post.data.content)}
-        </Flex>
-      </Flex>
       <Box>
-        {post.data.content.map(content => (
-          <Box key={content.heading}>
-            <Text
-              fontSize="36px"
-              fontWeight="bold"
-              color="brand.heading"
-              mb={5}
-            >
-              {content.heading}
-            </Text>
-            <Box
-              fontSize="18px"
-              // eslint-disable-next-line react/no-danger
-              dangerouslySetInnerHTML={{
-                __html: RichText.asHtml(content.body),
-              }}
-            />
-          </Box>
-        ))}
+        {post.data.banner && (
+          <Image
+            className={styles.banner}
+            src={post.data.banner.url}
+            alt="banner"
+            w="100%"
+            height={400}
+            objectFit="cover"
+          />
+        )}
+      </Box>
+      <Box maxWidth={1280} p={5} margin="auto">
+        <Text fontSize="48px" fontWeight="bold" color="brand.heading">
+          {post.data.title}
+        </Text>
+        <Flex gap={2} className={styles.postInfo} mb={8}>
+          <Flex gap={1} alignItems="center">
+            <Icon as={FiCalendar} boxSize={4} />
+            {format(new Date(post.first_publication_date), 'd LLL y', {
+              locale: ptBR,
+            })}
+          </Flex>
+          <Flex gap={1} alignItems="center">
+            <Icon as={FiUser} boxSize={4} />
+            {post.data.author}
+          </Flex>
+          <Flex gap={1} alignItems="center">
+            <Icon as={FiClock} boxSize={4} />
+            {calculateReadingTime(post.data.content)}
+          </Flex>
+        </Flex>
+        <Box>
+          {post.data.content.map(content => (
+            <Box key={content.heading}>
+              <Text
+                fontSize="36px"
+                fontWeight="bold"
+                color="brand.heading"
+                mb={5}
+              >
+                {content.heading}
+              </Text>
+              <Box
+                fontSize="18px"
+                // eslint-disable-next-line react/no-danger
+                dangerouslySetInnerHTML={{
+                  __html: RichText.asHtml(content.body),
+                }}
+              />
+            </Box>
+          ))}
+        </Box>
       </Box>
     </Box>
   );
