@@ -1,11 +1,12 @@
 import { GetStaticProps } from 'next';
-import { Button, Flex, Icon, Link, Stack, Text } from '@chakra-ui/react';
+import { Button, Flex, Icon, Stack, Text } from '@chakra-ui/react';
 import { useState } from 'react';
 import { PrismicDocument } from '@prismicio/types';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import Head from 'next/head';
+import Link from 'next/link';
 import { getPrismicClient } from '../services/prismic';
 
 interface Post {
