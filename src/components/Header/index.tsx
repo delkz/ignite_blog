@@ -11,7 +11,7 @@ export default function Header(): JSX.Element {
       <Box maxWidth={1280} p={5} margin="auto">
         <Link href="/">
           <Box cursor="pointer">
-            <Image src="/images/logo.svg" alt="logo" width={240} height={105} />
+            <Image src="/image/Logo.svg" alt="logo" width={240} height={105} />
           </Box>
         </Link>
       </Box>
