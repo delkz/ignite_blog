@@ -1,13 +1,10 @@
 import { GetStaticProps } from 'next';
-import { Button, Flex, Icon, Stack, Text } from '@chakra-ui/react';
+import { Button, Stack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { PrismicDocument } from '@prismicio/types';
-import { FiCalendar, FiUser } from 'react-icons/fi';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import Head from 'next/head';
-import Link from 'next/link';
 import { getPrismicClient } from '../services/prismic';
+import PostCard from '../components/PostCard';
 
 interface Post {
   uid?: string;
@@ -67,29 +64,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
         <title>Posts | Spacetraveling</title>
       </Head>
       {posts.map(post => {
-        return (
-          <Flex key={post.uid} gap={0} flexDirection="column">
-            <Text color="brand.heading" fontWeight="bold" fontSize="28px">
-              <Link href={`/post/${post.uid}`}>{post.data.title}</Link>
-            </Text>
-
-            <Stack color="brand.body" gap={3}>
-              <Text fontSize="18px">{post.data.subtitle}</Text>
-              <Flex color="brand.body" fontSize="14px" gap={3}>
-                <Flex align="center" gap={1}>
-                  <Icon as={FiCalendar} boxSize={4} />
-                  {format(new Date(post.first_publication_date), 'd LLL y', {
-                    locale: ptBR,
-                  })}
-                </Flex>
-                <Flex align="center" gap={1}>
-                  <Icon as={FiUser} boxSize={4} />
-                  {post.data.author}
-                </Flex>
-              </Flex>
-            </Stack>
-          </Flex>
-        );
+        return <PostCard key={post.uid} post={post} />;
       })}
       {nextPage && (
         <Button
